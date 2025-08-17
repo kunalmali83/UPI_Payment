@@ -1,0 +1,39 @@
+/* src/components/CheckBalance.css */
+
+.balance-container {
+  width: 400px;
+  margin: 40px auto;
+  padding: 25px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+  background: #fafafa;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.balance-form input {
+  width: 100%;
+  padding: 10px;
+  margin: 12px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.balance-form button {
+  padding: 10px 20px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.balance-form button:hover {
+  background-color: #005fa3;
+}
+
+.balance-result {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #333;
+}
