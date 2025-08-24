@@ -72,7 +72,7 @@ public class UserService {
             account.setBalance(BigDecimal.ZERO);
             account.setUser(newUser); // Set owning user
             account.setBankName(accReq.getBankName());
-            account.setPin(passwordEncoder.encode(accReq.getPin())); // Add this
+            account.setPin(passwordEncoder.encode(accReq.getPin()));
             account.setIfsc(accReq.getIfsc());
 
 

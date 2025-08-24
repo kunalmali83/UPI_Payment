@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3001") // Your React frontend
+                    .allowedOrigins("http://localhost:3000") // Your React frontend
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Must include OPTIONS
                     .allowedHeaders("*")
                     .allowCredentials(true);

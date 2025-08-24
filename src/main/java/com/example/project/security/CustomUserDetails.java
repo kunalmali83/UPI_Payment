@@ -42,7 +42,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail(); // or accountNumber if login by accountNo
+    	return accountNumber; // or accountNumber if login by accountNo
     }
 
     @Override

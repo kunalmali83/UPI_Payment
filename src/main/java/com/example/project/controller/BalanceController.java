@@ -35,8 +35,10 @@ public class BalanceController {
 
         String accountNumber = auth.getName(); // From JWT
         String enteredPin = payload.get("pin");
-
+        
         Optional<BankAccount> optional = repo.findByAccountNumber(accountNumber);
+        System.out.println("Auth Name=[" + accountNumber + "], length=" + accountNumber.length());
+
         if (optional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account not found.");
         }
