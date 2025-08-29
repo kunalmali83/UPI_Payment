@@ -19,10 +19,10 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Export account-specific API calls
-const accountApi = {
- getBalance: (pin) => axiosInstance.post("/account/checkBalance", { pin }),
-  getAccounts: () => axiosInstance.get("/account/list"),
+// Export transfer-specific API calls
+const transferApi = {
+  identifyReceiver: (data) => axiosInstance.post("/transfer/identify", data),
+  confirmTransfer: (data) => axiosInstance.post("/transfer/confirm-transfer", data),
 };
 
-export default accountApi;
+export default transferApi;

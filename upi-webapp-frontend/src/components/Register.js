@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api/axiosConfig';
+import api from '../api/axiosUser'; 
 import './Register.css';
 
 const Register = () => {

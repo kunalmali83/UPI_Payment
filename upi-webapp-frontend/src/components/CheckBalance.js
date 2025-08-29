@@ -1,52 +1,56 @@
-// src/components/CheckBalance.js
-import React, { useState } from 'react';
-import accountApi from '../api/axiosAccount';
-import './CheckBalance.css';
+import React, { useState } from "react";
+import accountApi from "../api/axiosAccount";
 
 const CheckBalance = () => {
+  const [pin, setPin] = useState("");
+  const [balance, setBalance] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [pin, setPin] = useState('');
-  const [result, setResult] = useState('');
-
-  const handleSubmit = async (e) => {
+  const handleCheckBalance = async (e) => {
     e.preventDefault();
- console.log("✅ Submit clicked with PIN:", pin); 
-    try {
-      // Inject accountNumber as a fake principal (not best practice)
-      // Instead, assume user is already authenticated, and backend extracts accountNumber from JWT.
-     const res = await accountApi.post('/checkBalance', { pin });
+    setLoading(true);
+    setError("");
+    setBalance(null);
 
-      if (res.status === 200) {
-        setResult(res.data); // expected string like "Your balance is ₹1000"
+    try {
+      // send PIN to backend along with request
+      const res = await accountApi.getBalance(pin);
+
+      if (res.data?.balance !== undefined) {
+        setBalance(res.data.balance);
       } else {
-        setResult('❌ Failed to fetch balance');
+        setError("Balance not found in response");
       }
     } catch (err) {
       console.error(err);
-      if (err.response && err.response.data) {
-        setResult(`❌ ${err.response.data}`);
-      } else {
-        setResult('❌ Something went wrong');
-      }
+      setError(err.response?.data?.message || "Failed to fetch balance");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="balance-container">
-      <h2>Check Account Balance</h2>
-      <form onSubmit={handleSubmit} className="balance-form">
-        {/* Just asking for PIN because accountNumber is extracted from JWT */}
-        <input
-          type="password"
-          placeholder="Enter your PIN"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          required
-        />
-        <button type="submit">Check Balance</button>
-      </form>
+    <div style={{ padding: "20px" }}>
+      <h2>💰 Account Balance</h2>
 
-      {result && <p className="balance-result">{result}</p>}
+      {!balance && !error && (
+        <form onSubmit={handleCheckBalance}>
+          <input
+            type="password"
+            placeholder="Enter UPI PIN"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? "Checking..." : "Check Balance"}
+          </button>
+        </form>
+      )}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {balance !== null && <p style={{ fontSize: "24px" }}>₹ {balance}</p>}
     </div>
   );
 };

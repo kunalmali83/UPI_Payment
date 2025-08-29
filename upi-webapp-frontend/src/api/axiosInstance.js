@@ -1,12 +1,10 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8081/api"; // base API URL
+const API_BASE_URL = "http://localhost:8081/api";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
 // Attach JWT for all requests
@@ -19,10 +17,4 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Export account-specific API calls
-const accountApi = {
- getBalance: (pin) => axiosInstance.post("/account/checkBalance", { pin }),
-  getAccounts: () => axiosInstance.get("/account/list"),
-};
-
-export default accountApi;
+export default axiosInstance;
