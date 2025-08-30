@@ -1,5 +1,7 @@
 package com.example.project.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody UserSignUpReq request) {
+    public ResponseEntity<Map<String, String>> registerUser(@Valid @RequestBody UserSignUpReq request) {
         return userService.registerUser(request);
     }
 

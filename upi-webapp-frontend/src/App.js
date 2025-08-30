@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import CheckBalance from "./components/CheckBalance";
 import IdentifyReceiver from "./pages/IdentifyReceiver";
 import ConfirmTransfer from "./pages/ConfirmTransfer";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (
@@ -21,12 +22,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes */}
+          {/* Protected Routes (require JWT login) */}
           <Route
             path="/checkBalance"
             element={
               <ProtectedRoute>
-                <CheckBalance />
+                <CheckBalance /> {/* calls GET /api/checkBalance */}
               </ProtectedRoute>
             }
           />
@@ -34,7 +35,7 @@ function App() {
             path="/transfer"
             element={
               <ProtectedRoute>
-                <IdentifyReceiver />
+                <IdentifyReceiver /> {/* calls POST /api/transfer/identify */}
               </ProtectedRoute>
             }
           />
@@ -42,10 +43,18 @@ function App() {
             path="/confirm-transfer"
             element={
               <ProtectedRoute>
-                <ConfirmTransfer />
+                <ConfirmTransfer /> {/* calls POST /api/transfer/confirm-transfer */}
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/chats"
+  element={
+    <ProtectedRoute>
+      <ChatPage />
+    </ProtectedRoute>
+  }
+/>
         </Routes>
       </Router>
     </AuthProvider>

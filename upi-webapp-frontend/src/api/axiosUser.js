@@ -22,7 +22,7 @@ axiosInstance.interceptors.request.use(
 // Export user-specific API calls
 const userApi = {
   login: (data) => axiosInstance.post("/users/login", data),
-  register: (data) => axiosInstance.post("/users/register", data),
+  register: (data) => axiosInstance.post("/users/signup", data),
   getProfile: () => axiosInstance.get("/users/profile"),
 };
 

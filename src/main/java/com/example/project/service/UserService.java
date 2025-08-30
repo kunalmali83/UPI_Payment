@@ -4,7 +4,9 @@ package com.example.project.service;
 import java.math.BigDecimal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.example.project.dto.BankAccountReq;
@@ -47,14 +49,26 @@ public class UserService {
     private JwtUtil jwtUtil;
 
 
-    public ResponseEntity<String> registerUser(UserSignUpReq request) {
-        // ✅ Check if any account number already exists in BankAccount table
+    public ResponseEntity<Map<String, String>> registerUser(UserSignUpReq request) {
+    	
+    	Map<String, String> response = new HashMap<>();
+
+        // Check if email already exists
+        if (userRepo.existsByEmail(request.getEmail())) {
+            response.put("message", "Email already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+      
+
+        // Check account numbers
         for (BankAccountReq accReq : request.getAccounts()) {
             if (balanceRepo.existsByAccountNumber(accReq.getAccountNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Account number " + accReq.getAccountNumber() + " already exists.");
+                response.put("message", "Account number " + accReq.getAccountNumber() + " already exists.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             }
         }
+
 
         // Create new user
         User newUser = new User();
@@ -92,7 +106,7 @@ public class UserService {
         newUser.setAccounts(savedAccounts);
         userRepo.save(newUser);
 
-        return ResponseEntity.ok("User registered with multiple bank accounts successfully.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     public ResponseEntity<?> login(UserLoginRequest loginRequest) {

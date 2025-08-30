@@ -12,22 +12,24 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await userApi.login({ accountNumber, password });
-      if (res.data?.token) {
-        login(res.data.token);
-        toast.success("Login successful!");
-        navigate("/");
-      } else {
-        toast.error("Invalid credentials");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Login failed. Please try again.");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await userApi.login({ accountNumber, password });
+    if (res.data?.token) {
+      // Save token + minimal user info
+      login(res.data.token, { accountNumber });
+      toast.success("Login successful!");
+      navigate("/"); // ✅ Go to Home
+    } else {
+      toast.error("Invalid credentials");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error("Login failed. Please try again.");
+  }
+};
+
 
   return (
     <div className="login-container">

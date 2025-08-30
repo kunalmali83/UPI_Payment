@@ -32,6 +32,9 @@ const Home = () => {
           <Link to="/checkBalance">
             <button>💰 Check Balance</button>
           </Link>
+          <Link to="/chats">
+            <button>💬 Chat</button>   {/* ✅ Chat option */}
+          </Link>
           <button onClick={handleLogout}>🚪 Logout</button>
         </div>
       )}

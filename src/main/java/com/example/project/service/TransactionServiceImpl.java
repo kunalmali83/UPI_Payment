@@ -128,6 +128,10 @@ public class TransactionServiceImpl implements TransactionService {
             )
         ).toList();
     }
+    public Transaction saveTransaction(Transaction transaction) {
+        return txnRepo.save(transaction);
+    }
+
 
 
 }

@@ -1,4 +1,5 @@
 package com.example.project.controller;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +54,22 @@ public class TransactionController {
         List<ChatOverviewDTO> chats = transactionService.getAllChatsForUser(loggedInMobile);
         return ResponseEntity.ok(chats);
     }
+    @PostMapping("/send")
+    public ResponseEntity<?> sendTransaction(@RequestBody Transaction transaction) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!(auth.getPrincipal() instanceof CustomUserDetails)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        String senderMobile = ((CustomUserDetails) auth.getPrincipal()).getMobileNumber();
+        transaction.setSenderMobile(senderMobile);
+        transaction.setTimestamp(LocalDateTime.now());
+
+        // Save using service
+        Transaction saved = transactionService.saveTransaction(transaction);
+        return ResponseEntity.ok(saved);
+    }
+
 
 
 }
