@@ -54,21 +54,7 @@ public class TransactionController {
         List<ChatOverviewDTO> chats = transactionService.getAllChatsForUser(loggedInMobile);
         return ResponseEntity.ok(chats);
     }
-    @PostMapping("/send")
-    public ResponseEntity<?> sendTransaction(@RequestBody Transaction transaction) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!(auth.getPrincipal() instanceof CustomUserDetails)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
 
-        String senderMobile = ((CustomUserDetails) auth.getPrincipal()).getMobileNumber();
-        transaction.setSenderMobile(senderMobile);
-        transaction.setTimestamp(LocalDateTime.now());
-
-        // Save using service
-        Transaction saved = transactionService.saveTransaction(transaction);
-        return ResponseEntity.ok(saved);
-    }
 
 
 

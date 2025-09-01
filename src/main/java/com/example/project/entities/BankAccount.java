@@ -20,11 +20,11 @@ public class BankAccount {
 	  @Column(name = "account_holder")
 	    private String accountHolder;
 
-	    @Column(name = "upi_id")
+	    @Column(name = "upi_id",nullable = false, unique = true)
 	    private String upiId;
 
 	    @Id
-	    @Column(name = "account_number")
+	    @Column(name = "account_number",nullable = false, unique = true)
 	    private String accountNumber;
 
 	    @Column(name = "balance")

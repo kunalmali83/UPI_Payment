@@ -30,20 +30,23 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AccountService accountService; // Service with DB + Redis caching
+
     @Override
     @Transactional
     public void transferMoney(String senderAccountNumber, TransferRequestDTO request) {
 
-        // Find sender
+        // 1️⃣ Find sender
         BankAccount sender = repo.findById(senderAccountNumber)
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
 
-        // Validate PIN
+        // 2️⃣ Validate PIN
         if (!passwordEncoder.matches(request.getPin(), sender.getPin())) {
             throw new RuntimeException("Invalid PIN");
         }
 
-        // Determine receiver
+        // 3️⃣ Determine receiver
         BankAccount receiver;
         TransferMethod method;
 
@@ -76,47 +79,47 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException("No valid receiver information provided");
         }
 
-        // Validate funds
+        // 4️⃣ Validate funds
         BigDecimal amountToTransfer = BigDecimal.valueOf(request.getAmount());
         if (sender.getBalance().compareTo(amountToTransfer) < 0) {
             throw new RuntimeException("Insufficient balance");
         }
 
-        // Perform transfer
-        sender.setBalance(sender.getBalance().subtract(amountToTransfer));
-        receiver.setBalance(receiver.getBalance().add(amountToTransfer));
+        // 5️⃣ Perform transfer using AccountService to update DB + Redis
+        BigDecimal senderNewBalance = sender.getBalance().subtract(amountToTransfer);
+        BigDecimal receiverNewBalance = receiver.getBalance().add(amountToTransfer);
 
-        repo.save(sender);
-        repo.save(receiver);
+        accountService.updateBalance(sender.getAccountNumber(), senderNewBalance);
+        accountService.updateBalance(receiver.getAccountNumber(), receiverNewBalance);
 
-        // Save transaction record
+        // 6️⃣ Save transaction record
         Transaction txn = new Transaction();
         txn.setAmount(amountToTransfer);
         txn.setTimestamp(LocalDateTime.now());
         txn.setMessage(request.getMessage() != null ? request.getMessage() :
                 "Transfer from " + sender.getUser().getName() + " to " + receiver.getUser().getName());
 
-        // ✅ set mobiles as well
         txn.setSenderUpi(sender.getUpiId());
-        txn.setSenderMobile(sender.getUser().getMobileNumber()); // <-- added
+        txn.setSenderMobile(sender.getUser().getMobileNumber());
         txn.setReceiverUpi(receiver.getUpiId());
         txn.setReceiverMobile(receiver.getUser().getMobileNumber());
 
         txn.setReceiverAccountNo(receiver.getAccountNumber());
         txn.setReceiverIfsc(receiver.getIfsc());
         txn.setMethod(method);
-        System.out.println("Sender mobile: " + sender.getUser().getMobileNumber());
-        System.out.println("Receiver mobile: " + receiver.getUser().getMobileNumber());
 
         txnRepo.save(txn);
     }
+
     @Override
     public List<Transaction> getChatHistory(String loggedInMobile, String otherMobile) {
         // Trim spaces and remove country code prefixes for safety
         String sender = loggedInMobile.replaceAll("\\D", "");
         String receiver = otherMobile.replaceAll("\\D", "");
         return txnRepo.findChatHistory(sender, receiver);
-    }@Override
+    }
+
+    @Override
     public List<ChatOverviewDTO> getAllChatsForUser(String mobile) {
         List<Object[]> rawResults = txnRepo.findAllChatsRaw(mobile);
         return rawResults.stream().map(r ->
@@ -128,10 +131,8 @@ public class TransactionServiceImpl implements TransactionService {
             )
         ).toList();
     }
+
     public Transaction saveTransaction(Transaction transaction) {
         return txnRepo.save(transaction);
     }
-
-
-
 }

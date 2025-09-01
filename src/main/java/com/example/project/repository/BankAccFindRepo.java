@@ -13,11 +13,13 @@ public interface BankAccFindRepo extends JpaRepository<BankAccount, String> {
 
     Optional<BankAccount> findByAccountNumberAndIfsc(String accountNo, String ifsc);
 
-   // Optional<BankAccount> findByAccountNumber(String accountNo);
+  // Optional<BankAccount> findByAccountNumber(String accountNo);
 
     Optional<BankAccount> findByUpiId(String upiId);
 
     List<BankAccount> findFirstByUser_MobileNumber(String mobileNumber);
+
+    Optional<BankAccount> findByAccountNumber(String accountNumber);
 
 
 }

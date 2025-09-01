@@ -1,22 +1,16 @@
 package com.example.project.controller;
-
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.project.dto.BalanceResponse;
 import com.example.project.entities.BankAccount;
+import com.example.project.service.AccountService;
 import com.example.project.repository.BalanceRepo;
 
 @RestController
@@ -24,33 +18,46 @@ import com.example.project.repository.BalanceRepo;
 public class BalanceController {
 
     @Autowired
-    private BalanceRepo repo;
-    
+    private AccountService accountService;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private BalanceRepo repo;
+
+    // ✅ Check balance endpoint
     @PostMapping("/checkBalance")
     public ResponseEntity<?> checkBalance(
             Authentication auth,
             @RequestBody Map<String, String> payload) {
 
-        String accountNumber = auth.getName(); // From JWT
+        String accountNumber = auth.getName();
         String enteredPin = payload.get("pin");
-        
-        Optional<BankAccount> optional = repo.findByAccountNumber(accountNumber);
-        System.out.println("Auth Name=[" + accountNumber + "], length=" + accountNumber.length());
 
-        if (optional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account not found.");
-        }
+        // Verify PIN
+        BankAccount account = repo.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        BankAccount account = optional.get();
         if (!passwordEncoder.matches(enteredPin, account.getPin())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("❌ Incorrect PIN");
+            return ResponseEntity.status(403).body("❌ Incorrect PIN");
         }
 
-        BalanceResponse response = new BalanceResponse(account.getAccountNumber(), account.getBalance());
-        return ResponseEntity.ok(response);
+        // Get balance via service (with Redis caching)
+        BigDecimal balance = accountService.getBalance(accountNumber);
+
+        return ResponseEntity.ok(new BalanceResponse(accountNumber, balance));
     }
 
+    // ✅ Optional: Endpoint to update balance
+    @PostMapping("/updateBalance")
+    public ResponseEntity<?> updateBalance(
+            @RequestBody Map<String, String> payload) {
 
+        String accountNumber = payload.get("accountNumber");
+        BigDecimal newBalance = new BigDecimal(payload.get("newBalance"));
+
+        accountService.updateBalance(accountNumber, newBalance);
+        return ResponseEntity.ok("Balance updated successfully");
+    }
 }
