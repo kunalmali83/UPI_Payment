@@ -27,6 +27,6 @@ public class UserSignUpReq {
    
     
     private List<BankAccountReq> accounts;
-
+    private String otp;
 
 }

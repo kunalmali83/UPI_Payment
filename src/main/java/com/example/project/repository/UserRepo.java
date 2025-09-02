@@ -9,11 +9,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 import com.example.project.entities.User;
-public interface UserRepo extends JpaRepository<User, String> {
-    Optional<User> findById(String userId);
 
-    Optional<User> findByEmail(String email);
+public interface  UserRepo extends JpaRepository<User,Long>{
 
-    boolean existsByEmail(String email);
+	 Optional<User> findByEmail(String email);
+
+	boolean existsByEmail(String email);
+
+	Optional<User> findById(Long userId);
+	
+	
+
+	
+
+	
 }
-

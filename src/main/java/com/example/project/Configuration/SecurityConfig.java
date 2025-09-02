@@ -41,7 +41,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
         .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                .requestMatchers("/api/users/signup", "/api/users/login","/api/users/send-otp", "/api/users/verify-otp-register").permitAll()
                 .requestMatchers("/api/transfer/**").permitAll()
                 .anyRequest().authenticated()
             )

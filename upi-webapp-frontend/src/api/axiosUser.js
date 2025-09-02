@@ -24,6 +24,8 @@ const userApi = {
   login: (data) => axiosInstance.post("/users/login", data),
   register: (data) => axiosInstance.post("/users/signup", data),
   getProfile: () => axiosInstance.get("/users/profile"),
+  sendOtp: (email) => axiosInstance.post("/users/send-otp", { email }),    // ✅ add
+  verifyOtpRegister: (data) => axiosInstance.post("/users/verify-otp-register", data), // ✅ add
 };
 
 export default userApi;
