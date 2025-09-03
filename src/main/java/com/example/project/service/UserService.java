@@ -132,6 +132,18 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
+    
+    public User getUserByAccountNumber(String accountNumber) {
+        return userRepo.findByAccountsAccountNumber(accountNumber)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    
+    public String getAccountNumberFromToken(String authHeader) {
+        // Assuming JWT token format: "Bearer <token>"
+        String token = authHeader.replace("Bearer ", "");
+        return jwtUtil.extractAccountNumber(token); // use your JWT service to decode
+    }
 
 
 }

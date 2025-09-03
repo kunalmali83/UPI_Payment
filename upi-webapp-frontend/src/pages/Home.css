@@ -1,11 +1,95 @@
-.home-container {
-  text-align: center;
-  padding: 50px;
+.home-wrapper {
+  padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #00b894, #6c5ce7);
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
 }
 
-.button-group button {
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 18px;
+/* Header */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logout-btn {
+  background: #d63031;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+/* Card Grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Dashboard cards */
+.card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  background: rgba(255,255,255,0.25);
+}
+
+.card .icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.card h3 {
+  margin: 0.3rem 0;
+  font-size: 1.1rem;
+}
+
+.card p {
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+/* Profile Section */
+.profile-section {
+  display: flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  padding: 15px 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.profile-avatar {
+  font-size: 50px;
+  margin-right: 15px;
+}
+
+.profile-info h2 {
+  color: #6c5ce7; /* Name in purple */
+  font-weight: 700;
+}
+
+.profile-info p {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #555;
 }

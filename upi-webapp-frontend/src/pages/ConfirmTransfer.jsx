@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import transferApi from "../api/axiosTransfer";
+import "./ConfirmTransfer.css";
 
 const ConfirmTransfer = () => {
   const [receiver, setReceiver] = useState(null);
@@ -8,26 +9,20 @@ const ConfirmTransfer = () => {
   const [messageError, setMessageError] = useState("");
   const [messageSuccess, setMessageSuccess] = useState("");
 
-  // Load receiver info from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("receiver");
     if (saved) setReceiver(JSON.parse(saved));
-    else {
-      setReceiver(null);
-      setMessageError("❌ No receiver selected");
-    }
+    else setMessageError("❌ No receiver selected");
   }, []);
 
   const handleTransfer = async (e) => {
     e.preventDefault();
-
     if (!receiver) {
       setMessageError("❌ No receiver selected");
       setMessageSuccess("");
       return;
     }
 
-    // Prepare payload matching TransferRequestDTO
     const payload = {
       receiverAccountNo: receiver.receiverAccount || null,
       receiverIfsc: receiver.receiverIfsc || null,
@@ -42,7 +37,6 @@ const ConfirmTransfer = () => {
       const res = await transferApi.confirmTransfer(payload);
       setMessageSuccess(`✅ ${res.data}`);
       setMessageError("");
-      // Clear localStorage and form
       localStorage.removeItem("receiver");
       setReceiver(null);
       setAmount("");
@@ -55,7 +49,7 @@ const ConfirmTransfer = () => {
   };
 
   return (
-    <div>
+    <div className="confirm-transfer-wrapper">
       <h2>Confirm Transfer</h2>
 
       {receiver && (
@@ -83,14 +77,14 @@ const ConfirmTransfer = () => {
         <input
           type="text"
           placeholder="Optional message"
-          value={messageSuccess} // optional message
+         
           onChange={(e) => setMessageSuccess(e.target.value)}
         />
         <button type="submit">Send Money</button>
       </form>
 
-      {messageError && <p style={{ color: "red" }}>{messageError}</p>}
-      {messageSuccess && <p style={{ color: "green" }}>{messageSuccess}</p>}
+      {messageError && <p className="message-error">{messageError}</p>}
+      {messageSuccess && <p className="message-success">{messageSuccess}</p>}
     </div>
   );
 };

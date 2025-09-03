@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route,Navigate  } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -16,18 +16,27 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+      
         <Routes>
+         <Route path="/" element={<Navigate to="/login" />} />
           {/* Public Routes */}
-          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes (require JWT login) */}
+          {/* Protected Routes */}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/checkBalance"
             element={
               <ProtectedRoute>
-                <CheckBalance /> {/* calls GET /api/checkBalance */}
+                <CheckBalance />
               </ProtectedRoute>
             }
           />
@@ -35,7 +44,7 @@ function App() {
             path="/transfer"
             element={
               <ProtectedRoute>
-                <IdentifyReceiver /> {/* calls POST /api/transfer/identify */}
+                <IdentifyReceiver />
               </ProtectedRoute>
             }
           />
@@ -43,18 +52,18 @@ function App() {
             path="/confirm-transfer"
             element={
               <ProtectedRoute>
-                <ConfirmTransfer /> {/* calls POST /api/transfer/confirm-transfer */}
+                <ConfirmTransfer />
               </ProtectedRoute>
             }
           />
           <Route
-  path="/chats"
-  element={
-    <ProtectedRoute>
-      <ChatPage />
-    </ProtectedRoute>
-  }
-/>
+            path="/chats"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>

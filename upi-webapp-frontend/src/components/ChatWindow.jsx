@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const ChatWindow = ({ mobile }) => {
@@ -17,14 +17,14 @@ const ChatWindow = ({ mobile }) => {
   }, [mobile]);
 
   return (
-    <div style={{ flex: 1, padding: "20px" }}>
+    <div className="chat-window">
       <h3>Transaction History with {mobile}</h3>
       {messages.length === 0 ? (
         <p>No transactions yet.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul className="chat-window-ul">
           {messages.map((msg, i) => (
-            <li key={i} style={{ marginBottom: "10px", padding: "8px", background: "#f9f9f9", borderRadius: "8px" }}>
+            <li key={i} className="chat-window-item">
               <b>{msg.senderMobile}</b> → <b>{msg.receiverMobile}</b> <br />
               Amount: ₹{msg.amount} <br />
               Message: {msg.message || "—"} <br />

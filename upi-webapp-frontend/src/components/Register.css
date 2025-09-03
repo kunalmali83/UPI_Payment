@@ -1,17 +1,118 @@
-.register-container {
+.register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-card {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 20px;
+  width: 450px;
+  max-width: 95%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   text-align: center;
-  margin-top: 50px;
 }
 
-.register-form input {
-  display: block;
-  margin: 10px auto;
-  padding: 8px;
-  width: 80%;
-  max-width: 300px;
+.register-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #333;
 }
 
-.register-form button {
-  padding: 10px 20px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group input {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #2575fc;
+  box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+}
+
+.section-title {
+  font-weight: 600;
   font-size: 16px;
+  margin: 20px 0 10px;
+  color: #444;
+  text-align: left;
+}
+
+.account-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.account-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.add-btn,
+.remove-btn,
+.otp-btn,
+.submit-btn {
+  padding: 12px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-btn { background-color: #00c853; color: white; }
+.add-btn:hover { background-color: #00b44a; }
+
+.remove-btn {
+  background-color: #d50000; color: white; font-size: 12px;
+  position: absolute; top: 0; right: 0; padding: 6px 10px;
+}
+.remove-btn:hover { background-color: #b00000; }
+
+.otp-btn { background-color: #2962ff; color: white; width: 100%; }
+.otp-btn:hover { background-color: #0039cb; }
+.otp-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.submit-btn { background-color: #ff6d00; color: white; width: 100%; }
+.submit-btn:hover { background-color: #e65c00; }
+
+input[name="otp"] {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+input[name="otp"]:focus {
+  border-color: #2962ff;
+  box-shadow: 0 0 5px rgba(41, 98, 255, 0.5);
+}
+
+/* Responsive for mobile */
+@media (max-width: 500px) {
+  .account-form { grid-template-columns: 1fr; }
 }

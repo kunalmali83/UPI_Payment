@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import accountApi from "../api/axiosAccount";
+import "./CheckBalance.css";
 
 const CheckBalance = () => {
   const [pin, setPin] = useState("");
@@ -14,9 +15,7 @@ const CheckBalance = () => {
     setBalance(null);
 
     try {
-      // send PIN to backend along with request
       const res = await accountApi.getBalance(pin);
-
       if (res.data?.balance !== undefined) {
         setBalance(res.data.balance);
       } else {
@@ -31,7 +30,7 @@ const CheckBalance = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="check-balance-wrapper">
       <h2>💰 Account Balance</h2>
 
       {!balance && !error && (
@@ -49,8 +48,8 @@ const CheckBalance = () => {
         </form>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {balance !== null && <p style={{ fontSize: "24px" }}>₹ {balance}</p>}
+      {error && <p className="error-message">{error}</p>}
+      {balance !== null && <p className="balance-display">₹ {balance}</p>}
     </div>
   );
 };

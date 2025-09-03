@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import transferApi from "../api/axiosTransfer";
+import "./IdentifyReceiver.css";
 
 const IdentifyReceiver = () => {
   const [method, setMethod] = useState("MOBILE");
@@ -9,7 +10,6 @@ const IdentifyReceiver = () => {
   const [bankAccount, setBankAccount] = useState("");
   const [ifsc, setIfsc] = useState("");
   const [result, setResult] = useState(null);
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,6 +22,7 @@ const IdentifyReceiver = () => {
         payload.bankAccount = bankAccount;
         payload.ifsc = ifsc;
       }
+
       const res = await transferApi.identifyReceiver(payload);
       setResult(res.data);
       localStorage.setItem("receiver", JSON.stringify(res.data));
@@ -33,7 +34,7 @@ const IdentifyReceiver = () => {
   };
 
   return (
-    <div>
+    <div className="identify-receiver-wrapper">
       <h2>Identify Receiver</h2>
       <form onSubmit={handleSubmit}>
         <select value={method} onChange={(e) => setMethod(e.target.value)}>
@@ -83,7 +84,7 @@ const IdentifyReceiver = () => {
       </form>
 
       {result && (
-        <p>
+        <p className="identify-receiver-result">
           ✅ Receiver Found: {result.receiverName} ({result.receiverAccount})
         </p>
       )}

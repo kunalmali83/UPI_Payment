@@ -1,26 +1,32 @@
-.check-balance-wrapper {
-  max-width: 400px;
-  margin: 50px auto;
+.confirm-transfer-wrapper {
+  max-width: 500px;
+  margin: 40px auto;
   padding: 25px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  text-align: center;
 }
 
-.check-balance-wrapper h2 {
-  margin-bottom: 20px;
+.confirm-transfer-wrapper h2 {
+  text-align: center;
+  margin-bottom: 25px;
   color: #1f2937;
 }
 
-.check-balance-wrapper form {
+.confirm-transfer-wrapper p {
+  margin-bottom: 20px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.confirm-transfer-wrapper form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.check-balance-wrapper input {
+.confirm-transfer-wrapper input {
   padding: 10px 12px;
   font-size: 16px;
   border-radius: 8px;
@@ -29,11 +35,11 @@
   transition: border-color 0.2s;
 }
 
-.check-balance-wrapper input:focus {
+.confirm-transfer-wrapper input:focus {
   border-color: #6366f1;
 }
 
-.check-balance-wrapper button {
+.confirm-transfer-wrapper button {
   padding: 10px 12px;
   font-size: 16px;
   border-radius: 8px;
@@ -44,19 +50,18 @@
   transition: background-color 0.2s;
 }
 
-.check-balance-wrapper button:hover {
+.confirm-transfer-wrapper button:hover {
   background-color: #4f46e5;
 }
 
-.balance-display {
-  margin-top: 20px;
-  font-size: 26px;
-  color: #1e3a8a;
-  font-weight: bold;
-}
-
-.error-message {
+.message-error {
   margin-top: 15px;
   color: #b91c1c;
+  font-weight: 500;
+}
+
+.message-success {
+  margin-top: 15px;
+  color: #16a34a;
   font-weight: 500;
 }
