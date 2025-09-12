@@ -6,23 +6,19 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.project.dto.UserLoginRequest;
 import com.example.project.dto.UserProfileDTO;
 import com.example.project.dto.UserSignUpReq;
+import com.example.project.entities.BankAccount;
 import com.example.project.entities.User;
 import com.example.project.service.OtpService;
 import com.example.project.service.UserService;
 import com.example.project.dto.BankAccountResp;
 
 import jakarta.validation.Valid;
+
 @CrossOrigin(origins = "http://localhost:3001")
 @RestController
 @RequestMapping("/api/users")
@@ -30,6 +26,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private OtpService otpService;
 
@@ -37,17 +34,16 @@ public class UserController {
         System.out.println("✅ UserController loaded");
     }
 
-
     @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> login(@RequestBody UserLoginRequest loginRequest) {
         return userService.login(loginRequest);
     }
-    
+
     @PostMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
         otpService.generateOtp(email);
-        System.out.println("🔹 sendOtp called for: " + email); 
+        System.out.println("🔹 sendOtp called for: " + email);
         return ResponseEntity.ok("OTP sent to email");
     }
 
@@ -60,39 +56,106 @@ public class UserController {
         }
         return userService.registerUser(request);
     }
-   
 
-        // Map to DTO
     @GetMapping("/profile")
-    public UserProfileDTO getProfile(@RequestHeader("Authorization") String authHeader) {
-        System.out.println("🔹 Profile endpoint hit");
+    public ResponseEntity<UserProfileDTO> getProfile(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).build();
+            }
 
-        String accountNumber = userService.getAccountNumberFromToken(authHeader);
-        System.out.println("🔹 Account number from token: " + accountNumber);
+            String mobileNumber = userService.getMobileFromToken(authHeader);
+            User user = userService.getUserByMobile(mobileNumber);
 
-        User user = userService.getUserByAccountNumber(accountNumber);
+            List<BankAccount> accounts = user.getAccounts();
+            accounts.size(); // ensure loaded
 
-        UserProfileDTO response = new UserProfileDTO();
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
-        response.setMobileNumber(user.getMobileNumber());
-        response.setAddress(user.getAddress());
+            UserProfileDTO response = new UserProfileDTO();
+            response.setName(user.getName());
+            response.setEmail(user.getEmail());
+            response.setMobileNumber(user.getMobileNumber());
+            response.setAddress(user.getAddress());
 
-        // Map bank accounts
-        List<BankAccountResp> accountDTOs = user.getAccounts().stream().map(acc -> {
-            BankAccountResp dto = new BankAccountResp();
-            dto.setAccountNumber(acc.getAccountNumber()); // show full number for testing
-            dto.setAccountHolder(acc.getAccountHolder());
-            dto.setBankName(acc.getBankName());
-            dto.setUpiId(acc.getUpiId());
-            dto.setBalance(acc.getBalance());
-            return dto;
-        }).toList();
+            List<BankAccountResp> accountDTOs = accounts.stream().map(acc -> {
+                BankAccountResp dto = new BankAccountResp();
+                dto.setAccountNumber(acc.getAccountNumber());
+                dto.setAccountHolder(acc.getAccountHolder());
+                dto.setBankName(acc.getBankName());
+                dto.setUpiId(acc.getUpiId());
+                dto.setBalance(acc.getBalance());
+                dto.setPrimary(acc.isPrimary());
+                return dto;
+            }).toList();
 
-        System.out.println("🔹 Accounts: " + accountDTOs);
+            response.setAccounts(accountDTOs);
 
-        response.setAccounts(accountDTOs);
-        return response;
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(401).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).build();
+        }
     }
 
+    @GetMapping("/my-accounts")
+    public ResponseEntity<List<BankAccountResp>> getMyAccounts(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(401).build();
+            }
+
+            String mobileNumber = userService.getMobileFromToken(authHeader);
+            User user = userService.getUserByMobile(mobileNumber);
+
+            List<BankAccount> accounts = user.getAccounts();
+            accounts.size();
+
+            List<BankAccountResp> accountDTOs = accounts.stream().map(acc -> {
+                BankAccountResp dto = new BankAccountResp();
+                dto.setAccountNumber(acc.getAccountNumber());
+                dto.setAccountHolder(acc.getAccountHolder());
+                dto.setBankName(acc.getBankName());
+                dto.setUpiId(acc.getUpiId());
+                dto.setBalance(acc.getBalance());
+                dto.setPrimary(acc.isPrimary());
+                return dto;
+            }).toList();
+
+            return ResponseEntity.ok(accountDTOs);
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(401).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/{mobile}/accounts")
+    public ResponseEntity<List<BankAccountResp>> getAccountsByMobile(@PathVariable String mobile) {
+        try {
+            User user = userService.getUserByMobile(mobile);
+            if (user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            List<BankAccount> accounts = user.getAccounts();
+            accounts.size();
+
+            List<BankAccountResp> accountDTOs = accounts.stream().map(acc -> {
+                BankAccountResp dto = new BankAccountResp();
+                dto.setAccountNumber(acc.getAccountNumber());
+                dto.setAccountHolder(acc.getAccountHolder());
+                dto.setBankName(acc.getBankName());
+                dto.setUpiId(acc.getUpiId());
+                dto.setBalance(acc.getBalance());
+                dto.setPrimary(acc.isPrimary());
+                return dto;
+            }).toList();
+
+            return ResponseEntity.ok(accountDTOs);
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).build();
+        }
+    }
 }

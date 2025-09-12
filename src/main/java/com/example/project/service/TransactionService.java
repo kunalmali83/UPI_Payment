@@ -10,11 +10,12 @@ public interface TransactionService {
 
 
 	
-	void transferMoney(String senderAccountNo, TransferRequestDTO request);
+	Transaction transferMoney(String senderAccountNo, TransferRequestDTO request);
 
 	List<Transaction> getChatHistory(String loggedInMobile, String otherMobile);
 
 
 	List<ChatOverviewDTO> getAllChatsForUser(String mobile);
 
+	
 }

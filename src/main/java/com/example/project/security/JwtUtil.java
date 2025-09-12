@@ -18,19 +18,20 @@ public class JwtUtil {
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
     private Key getSigningKey() {
+    	
         return Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String accountNumber) {
+    public String generateToken(String mobileNumber) {
         return Jwts.builder()
-                .setSubject(accountNumber)
+                .setSubject(mobileNumber)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String extractAccountNumber(String token) {
+    public String extractMobileNumber(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
@@ -38,6 +39,7 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
+
 
     public boolean validateToken(String token) {
         try {
@@ -50,4 +52,6 @@ public class JwtUtil {
             return false;
         }
     }
+
+	
 }

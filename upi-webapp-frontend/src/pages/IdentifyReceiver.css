@@ -1,7 +1,7 @@
 .identify-receiver-wrapper {
-  max-width: 500px;
+  max-width: 450px;
   margin: 40px auto;
-  padding: 25px;
+  padding: 30px;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -14,29 +14,32 @@
   color: #1f2937;
 }
 
-.identify-receiver-wrapper form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.identify-receiver-wrapper label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .identify-receiver-wrapper input,
 .identify-receiver-wrapper select {
+  width: 100%;
   padding: 10px 15px;
   font-size: 16px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   outline: none;
-  transition: border 0.2s;
+  margin-bottom: 15px;
+  box-sizing: border-box;
 }
 
 .identify-receiver-wrapper input:focus,
 .identify-receiver-wrapper select:focus {
-  border-color: #6366f1; /* soft indigo focus */
+  border-color: #6366f1;
 }
 
 .identify-receiver-wrapper button {
-  padding: 10px 15px;
+  width: 100%;
+  padding: 12px;
   font-size: 16px;
   background: #6366f1;
   color: white;
@@ -48,13 +51,4 @@
 
 .identify-receiver-wrapper button:hover {
   background: #4f46e5;
-}
-
-.identify-receiver-result {
-  margin-top: 20px;
-  padding: 10px 15px;
-  background: #e0f2fe;
-  border-radius: 8px;
-  color: #0369a1;
-  text-align: center;
 }

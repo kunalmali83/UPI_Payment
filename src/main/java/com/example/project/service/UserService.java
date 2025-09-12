@@ -112,38 +112,60 @@ public class UserService {
     public ResponseEntity<?> login(UserLoginRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.getAccountNumber(), loginRequest.getPassword()
-                )
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getMobileNumber(), loginRequest.getPassword()
+                    )
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
 
-            String token = jwtUtil.generateToken(userDetails.getAccountNumber());
+            // Generate JWT using mobile number
+            String token = jwtUtil.generateToken(userDetails.getMobileNumber());
 
             UserResponse response = new UserResponse(user.getName(), user.getEmail(), token);
             return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + token)
-                .body(response);
+                    .header("Authorization", "Bearer " + token)
+                    .body(response);
 
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
-    
-    public User getUserByAccountNumber(String accountNumber) {
-        return userRepo.findByAccountsAccountNumber(accountNumber)
+
+    // ✅ Get user by mobile number (for sender/receiver validation)
+    public User getUserByMobile(String mobile) {
+        return userRepo.findByMobileNumber(mobile)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    
-    public String getAccountNumberFromToken(String authHeader) {
+    // ✅ Get user's primary account
+    public BankAccount getPrimaryAccount(String mobileNumber) {
+        User user = getUserByMobile(mobileNumber);
+        return user.getAccounts().stream()
+                .filter(BankAccount::isPrimary)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Primary account not found"));
+    }
+
+    // ✅ Check if sender owns selected account
+    public boolean isAccountOwnedByUser(String fromAccountNo, String mobileNumber) {
+        User user = getUserByMobile(mobileNumber);
+        return user.getAccounts().stream()
+                .anyMatch(acc -> acc.getAccountNumber().equals(fromAccountNo));
+    }
+ // In UserService
+    public String getMobileFromToken(String authHeader) {
         // Assuming JWT token format: "Bearer <token>"
         String token = authHeader.replace("Bearer ", "");
-        return jwtUtil.extractAccountNumber(token); // use your JWT service to decode
+        return jwtUtil.extractMobileNumber(token); // extract mobile number from JWT
     }
+    public User findByMobileNumber(String mobileNumber) {
+        return userRepo.findByMobileNumber(mobileNumber)
+                .orElseThrow(() -> new RuntimeException("User not found with mobile: " + mobileNumber));
+    }
+
 
 
 }

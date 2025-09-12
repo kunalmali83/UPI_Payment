@@ -40,12 +40,19 @@ public class BankAccount {
 	    
 	    @Column(nullable = false)
 	    private String pin;  // Store hashed PIN
-	    
+	    private boolean isprimary;
 	    private String ifsc;
 	public BankAccount() {
 	
 	}
 	
+	public boolean isPrimary() {
+        return isprimary;
+    }
+
+    public void setPrimary(boolean isprimary) {
+        this.isprimary = isprimary;
+    }
 
 
 
@@ -67,7 +74,7 @@ public class BankAccount {
 
 
 	public BankAccount(String accountHolder, String upiId, String accountNumber, BigDecimal balance, User user,
-			String bankName, String pin, String ifsc) {
+			String bankName, String pin, String ifsc,boolean isprimary) {
 		super();
 		this.accountHolder = accountHolder;
 		this.upiId = upiId;
@@ -77,6 +84,7 @@ public class BankAccount {
 		this.bankName = bankName;
 		this.pin = pin;
 		this.ifsc = ifsc;
+		this.isprimary=isprimary;
 	}
 
 
@@ -139,6 +147,7 @@ public class BankAccount {
 	public void setPin(String pin) {
 		this.pin = pin;
 	}
+
 
 
 

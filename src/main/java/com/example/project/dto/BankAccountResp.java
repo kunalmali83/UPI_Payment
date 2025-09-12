@@ -10,4 +10,5 @@ public class BankAccountResp {
     private String bankName;
     private String upiId;
     private BigDecimal balance;   // optional
+    private boolean primary;
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 
 public class UserLoginRequest {
-	private String accountNumber;
+	private String mobileNumber;
 
 	private String password;
 	

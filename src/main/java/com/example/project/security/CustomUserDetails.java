@@ -8,26 +8,18 @@ import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
     private final User user;
-    private final String accountNumber;
-    private final String mobileNumber;
 
-    public CustomUserDetails(User user, String accountNumber) {
+    public CustomUserDetails(User user) {
         this.user = user;
-        this.accountNumber = accountNumber;
-        this.mobileNumber = user.getMobileNumber(); // ✅ fetch from linked User
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    // Expose the whole User entity if needed
+    public User getUser() {
+        return user;
     }
 
     public String getMobileNumber() {
-        return mobileNumber;
-    }
-
-    // ✅ Add this so you can fetch the whole User entity
-    public User getUser() {
-        return user;
+        return user.getMobileNumber();
     }
 
     @Override
@@ -37,12 +29,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return user.getPassword(); // password or hashed PIN
     }
 
     @Override
     public String getUsername() {
-    	return accountNumber; // or accountNumber if login by accountNo
+        return user.getMobileNumber(); // ✅ login identifier is mobile number
     }
 
     @Override

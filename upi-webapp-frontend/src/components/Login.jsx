@@ -1,46 +1,47 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import { AuthContext } from "../context/AuthContext";
 import userApi from "../api/axiosUser";
-import "react-toastify/dist/ReactToastify.css";
+import { AuthContext } from "../context/AuthContext";
 import "./Login.css";
 
 const Login = () => {
-  const [accountNumber, setAccountNumber] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await userApi.login({ accountNumber, password });
-      if (res.data?.token) {
-        login(res.data.token, { accountNumber });
-        toast.success("Login successful!");
-        navigate("/home"); // Go to dashboard
-      } else {
-        toast.error("Invalid credentials");
+      const res = await userApi.login({ mobileNumber: mobile, password });
+      const token = res.data.token || res.data.jwt || res.data.accessToken;
+      const userData = res.data.user || {};
+
+      if (!token) {
+        setError("No token received from server");
+        return;
       }
+
+      login(token, userData);
+      navigate("/home");
     } catch (err) {
-      console.error(err);
-      toast.error("Login failed. Please try again.");
+      setError("Invalid credentials or server error");
+      console.error("Login error:", err.response || err);
     }
   };
 
   return (
     <div className="auth-wrapper">
-      <ToastContainer position="top-center" autoClose={2000} />
       <div className="auth-card">
-        <h2 className="auth-title">Welcome Back!</h2>
-        <p className="auth-subtitle">Login to your UPI account</p>
-        <form onSubmit={handleSubmit}>
+        <h2 className="auth-title">Login</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <form onSubmit={handleLogin}>
           <input
             type="text"
-            placeholder="Account Number"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
+            placeholder="Mobile Number"
+            value={mobile}
+            onChange={(e) => setMobile(e.target.value)}
             required
           />
           <input
@@ -52,9 +53,19 @@ const Login = () => {
           />
           <button type="submit" className="btn-primary">Login</button>
         </form>
-        <p className="auth-footer">
-          Don’t have an account? <span className="link" onClick={() => navigate("/register")}>Sign Up</span>
-        </p>
+
+        {/* Sign Up Link */}
+        <div className="auth-footer">
+          <p>
+            Don't have an account?{" "}
+            <span
+              className="signup-link"
+              onClick={() => navigate("/register")}
+            >
+              Sign Up
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   );

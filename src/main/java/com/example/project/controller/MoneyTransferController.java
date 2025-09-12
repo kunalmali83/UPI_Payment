@@ -1,6 +1,5 @@
 package com.example.project.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.project.dto.ReceiverIdentifierDTO;
 import com.example.project.dto.TransferRequestDTO;
@@ -22,7 +16,6 @@ import com.example.project.entities.Transaction;
 import com.example.project.security.CustomUserDetails;
 import com.example.project.service.BankAccountService;
 import com.example.project.service.TransactionService;
-
 @RestController
 @RequestMapping("/api/transfer")
 public class MoneyTransferController {
@@ -33,7 +26,7 @@ public class MoneyTransferController {
     @Autowired
     private TransactionService transactionService;
 
-    // Step 1: Identify receiver
+    // ✅ Step 1: Identify receiver
     @PostMapping("/identify")
     public ResponseEntity<?> identifyReceiver(@RequestBody ReceiverIdentifierDTO dto) {
         BankAccount receiver = null;
@@ -62,37 +55,41 @@ public class MoneyTransferController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Receiver not found");
         }
 
+        // ✅ Return minimal info to frontend for confirmation
         return ResponseEntity.ok(Map.of(
             "receiverName", receiver.getUser().getName(),
-            "receiverAccount", receiver.getAccountNumber()
+            "receiverAccountNo", receiver.getAccountNumber(),
+            "bankName", receiver.getBankName(),
+            "receiverMobile", receiver.getUser().getMobileNumber()
         ));
     }
 
-    // Step 2: Confirm and Transfer
- // Step 2: Confirm and Transfer
+    // ✅ Step 2: Confirm and Transfer
     @PostMapping("/confirm-transfer")
     public ResponseEntity<?> transferMoney(@RequestBody TransferRequestDTO request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-            // ✅ Check if principal is of correct type
             Object principal = auth.getPrincipal();
+
             if (!(principal instanceof CustomUserDetails)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized or invalid token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                     .body("Unauthorized or invalid token");
             }
 
-            String senderAccountNo = ((CustomUserDetails) principal).getAccountNumber();
+            String loggedInMobile = ((CustomUserDetails) principal).getMobileNumber();
 
-            // ✅ Pass senderAccountNo and whole request DTO
-            transactionService.transferMoney(senderAccountNo, request);
+            // 1️⃣ Ensure sender owns the selected account
+            if (!bankAccountService.isAccountOwnedByUser(request.getFromAccountNo(), loggedInMobile)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid sender account");
+            }
 
+            // 2️⃣ Perform transfer
+            Transaction tx = transactionService.transferMoney(loggedInMobile, request);
 
+            return ResponseEntity.ok(tx);
 
-            return ResponseEntity.ok("Transfer successful");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-
 }

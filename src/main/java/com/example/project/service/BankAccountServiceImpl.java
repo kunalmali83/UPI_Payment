@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.project.entities.BankAccount;
+import com.example.project.entities.User;
 import com.example.project.repository.BankAccFindRepo;
 
 
@@ -46,5 +47,33 @@ public class BankAccountServiceImpl implements BankAccountService {
         return repo.findByUpiId(upiId)
                    .orElseThrow(() -> new RuntimeException("Account not found for UPI ID"));
     }
-   
+    @Override
+    public boolean isAccountOwnedByUser(String fromAccountNo, String mobileNumber) {
+        Optional<BankAccount> opt = repo.findByAccountNumber(fromAccountNo);
+        if (opt.isEmpty()) return false;
+        return mobileNumber.equals(opt.get().getUser().getMobileNumber());
+    }
+
+    
+    public BankAccount getPrimaryAccount(String mobileNumber) {
+        List<BankAccount> accounts = repo.findFirstByUser_MobileNumber(mobileNumber);
+        if (accounts.isEmpty()) {
+            throw new RuntimeException("Receiver not found");
+        }
+
+        // Assuming `isPrimary` flag exists in BankAccount entity
+        return accounts.stream()
+                .filter(BankAccount::isPrimary)
+                .findFirst()
+                .orElse(accounts.get(0)); // fallback if no primary flag
+    }
+
+	@Override
+	public List<BankAccount> getAccountsByUser(User user) {
+		
+		        return repo.findByUser(user);
+		    
+
+	}
+      
 }

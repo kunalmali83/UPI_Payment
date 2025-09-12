@@ -1,90 +1,112 @@
 import React, { useState, useEffect } from "react";
-import transferApi from "../api/axiosTransfer";
+import { useLocation, useNavigate } from "react-router-dom";
+import axiosTransfer from "../api/axiosTransfer";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./ConfirmTransfer.css";
 
 const ConfirmTransfer = () => {
-  const [receiver, setReceiver] = useState(null);
-  const [amount, setAmount] = useState("");
-  const [pin, setPin] = useState("");
-  const [messageError, setMessageError] = useState("");
-  const [messageSuccess, setMessageSuccess] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  // Receiver info passed from IdentifyReceiver
+  const { receiver, method } = location.state || {};
+
+  const [accounts, setAccounts] = useState([]);
+  const [form, setForm] = useState({
+    fromAccountNo: "",
+    amount: "",
+    pin: "",
+    message: "",
+  });
+
+  // Fetch sender's accounts from backend
   useEffect(() => {
-    const saved = localStorage.getItem("receiver");
-    if (saved) setReceiver(JSON.parse(saved));
-    else setMessageError("❌ No receiver selected");
+    const fetchAccounts = async () => {
+      try {
+        const res = await axiosTransfer.getMyAccounts();
+        setAccounts(res.data);
+        if (res.data.length > 0) setForm((prev) => ({ ...prev, fromAccountNo: res.data[0].accountNumber }));
+      } catch (err) {
+        toast.error("Failed to fetch accounts");
+      }
+    };
+    fetchAccounts();
   }, []);
 
-  const handleTransfer = async (e) => {
-    e.preventDefault();
-    if (!receiver) {
-      setMessageError("❌ No receiver selected");
-      setMessageSuccess("");
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const confirmTransfer = async () => {
+    if (!form.amount || !form.pin) {
+      toast.error("Amount and PIN are required");
       return;
     }
 
     const payload = {
-      receiverAccountNo: receiver.receiverAccount || null,
-      receiverIfsc: receiver.receiverIfsc || null,
-      receiverMobileNumber: receiver.receiverMobileNumber || null,
-      receiverUpiId: receiver.receiverUpiId || null,
-      amount: Number(amount),
-      pin,
-      message: messageSuccess || "",
+      ...form,
+      method,
+      receiverMobile: receiver.receiverMobile,
+      receiverAccountNo: receiver.receiverAccountNo,
+      receiverIfsc: receiver.bankName ? receiver.receiverIfsc : undefined,
+      upiId: receiver.upiId,
     };
 
-    try {
-      const res = await transferApi.confirmTransfer(payload);
-      setMessageSuccess(`✅ ${res.data}`);
-      setMessageError("");
-      localStorage.removeItem("receiver");
-      setReceiver(null);
-      setAmount("");
-      setPin("");
-    } catch (err) {
-      console.error(err);
-      setMessageError(err.response?.data || "❌ Transfer failed");
-      setMessageSuccess("");
-    }
-  };
+     try {
+    await axiosTransfer.confirmTransfer(payload);
+    toast.success("Transaction successful! Redirecting to home...", { autoClose: 2000 });
+
+    // Redirect after 2 seconds to allow toast to show
+    setTimeout(() => {
+      navigate("/home");
+    }, 2000);
+    
+  } catch (err) {
+    toast.error(err.response?.data || "Transaction failed");
+  }
+};
+
+  if (!receiver) return <p>No receiver information found.</p>;
 
   return (
     <div className="confirm-transfer-wrapper">
+      <ToastContainer position="top-center" autoClose={2000} />
       <h2>Confirm Transfer</h2>
 
-      {receiver && (
-        <p>
-          Sending money to <b>{receiver.receiverName}</b> (A/C:{" "}
-          {receiver.receiverAccount || receiver.receiverUpiId || receiver.receiverMobileNumber})
-        </p>
-      )}
+      <p>Sending money to: <strong>{receiver.receiverName}</strong></p>
+      <p>Account / Mobile: <strong>{receiver.receiverAccountNo || receiver.receiverMobile}</strong></p>
 
-      <form onSubmit={handleTransfer}>
-        <input
-          type="number"
-          placeholder="Enter amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Enter PIN"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Optional message"
-         
-          onChange={(e) => setMessageSuccess(e.target.value)}
-        />
-        <button type="submit">Send Money</button>
-      </form>
+      <label>From Account:</label>
+      <select name="fromAccountNo" value={form.fromAccountNo} onChange={handleChange}>
+        {accounts.map((acc) => (
+          <option key={acc.accountNumber} value={acc.accountNumber}>
+            {acc.accountNumber} - {acc.bankName}
+          </option>
+        ))}
+      </select>
 
-      {messageError && <p className="message-error">{messageError}</p>}
-      {messageSuccess && <p className="message-success">{messageSuccess}</p>}
+      <input
+        type="number"
+        name="amount"
+        placeholder="Amount"
+        value={form.amount}
+        onChange={handleChange}
+      />
+      <input
+        type="password"
+        name="pin"
+        placeholder="PIN"
+        value={form.pin}
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="message"
+        placeholder="Message (optional)"
+        value={form.message}
+        onChange={handleChange}
+      />
+
+      <button onClick={confirmTransfer}>Transfer Money</button>
     </div>
   );
 };
