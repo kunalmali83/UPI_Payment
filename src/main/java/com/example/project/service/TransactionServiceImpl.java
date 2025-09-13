@@ -45,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public Transaction transferMoney(String senderMobile, TransferRequestDTO request) {
 
-        // 1️⃣ Find sender account and validate it belongs to this user
+        // 1️⃣ Find sender account and validate ownership
         BankAccount sender = repo.findByAccountNumber(request.getFromAccountNo())
                 .orElseThrow(() -> new RuntimeException("Sender account not found"));
 
@@ -58,14 +58,37 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException("Invalid PIN");
         }
 
-        // 3️⃣ Find receiver’s **primary account**
-        User receiverUser = userRepo.findByMobileNumber(request.getReceiverMobile())
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+        // 3️⃣ Find receiver account based on selected transfer method
+        BankAccount receiver = null;
+        switch (request.getMethod()) {
+            case ACCOUNT_IFSC:
+                if (request.getReceiverAccountNo() == null || request.getReceiverIfsc() == null) {
+                    throw new RuntimeException("Account number and IFSC are required");
+                }
+                receiver = repo.findByAccountNumberAndIfsc(request.getReceiverAccountNo(), request.getReceiverIfsc())
+                        .orElseThrow(() -> new RuntimeException("Receiver account not found"));
+                break;
 
-        BankAccount receiver = receiverUser.getAccounts().stream()
-                .filter(BankAccount::isPrimary)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Receiver does not have a primary account"));
+            case MOBILE:
+                if (request.getReceiverMobile() == null) {
+                    throw new RuntimeException("Receiver mobile required");
+                }
+                User receiverUser = userRepo.findByMobileNumber(request.getReceiverMobile())
+                        .orElseThrow(() -> new RuntimeException("Receiver not found"));
+                receiver = receiverUser.getAccounts().stream()
+                        .filter(BankAccount::isPrimary)
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Receiver does not have a primary account"));
+                break;
+
+            case UPI:
+                if (request.getUpiId() == null) {
+                    throw new RuntimeException("Receiver UPI ID required");
+                }
+                receiver = repo.findByUpiId(request.getUpiId())
+                        .orElseThrow(() -> new RuntimeException("Receiver UPI ID not found"));
+                break;
+        }
 
         // 4️⃣ Validate funds
         BigDecimal amount = BigDecimal.valueOf(request.getAmount());
@@ -74,30 +97,26 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         // 5️⃣ Update balances
-        BigDecimal senderNewBalance = sender.getBalance().subtract(amount);
-        BigDecimal receiverNewBalance = receiver.getBalance().add(amount);
+        accountService.updateBalance(sender.getAccountNumber(), sender.getBalance().subtract(amount));
+        accountService.updateBalance(receiver.getAccountNumber(), receiver.getBalance().add(amount));
 
-        accountService.updateBalance(sender.getAccountNumber(), senderNewBalance);
-        accountService.updateBalance(receiver.getAccountNumber(), receiverNewBalance);
-
-        // 6️⃣ Create and save transaction
+        // 6️⃣ Save transaction
         Transaction txn = new Transaction();
         txn.setAmount(amount);
         txn.setTimestamp(LocalDateTime.now());
         txn.setMessage(request.getMessage() != null ? request.getMessage() :
                 "Transfer from " + sender.getUser().getName() + " to " + receiver.getUser().getName());
-
         txn.setSenderMobile(sender.getUser().getMobileNumber());
         txn.setSenderUpi(sender.getUpiId());
         txn.setReceiverMobile(receiver.getUser().getMobileNumber());
         txn.setReceiverUpi(receiver.getUpiId());
-
         txn.setReceiverAccountNo(receiver.getAccountNumber());
         txn.setReceiverIfsc(receiver.getIfsc());
-        txn.setMethod(TransferMethod.ACCOUNT_IFSC); // or MOBILE/UPI based on flow
+        txn.setMethod(request.getMethod());
 
         return txnRepo.save(txn);
     }
+
 
     @Override
     public List<Transaction> getChatHistory(String loggedInMobile, String otherMobile) {

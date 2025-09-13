@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-const userApi = {
+const axiosUser = {
   login: (data) => axiosInstance.post("/users/login", data),
   register: (data) => axiosInstance.post("/users/signup", data),
   getProfile: () => axiosInstance.get("/users/profile"),
@@ -12,4 +12,4 @@ const userApi = {
     axiosInstance.post("/users/verify-otp-register", data),
 };
 
-export default userApi;
+export default axiosUser;

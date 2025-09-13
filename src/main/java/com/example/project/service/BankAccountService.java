@@ -10,7 +10,7 @@ public interface BankAccountService {
     BankAccount findByUserMobile(String mobileNumber);
     BankAccount findByUpiId(String upiId);
     boolean isAccountOwnedByUser(String fromAccountNo,  String mobileNumber);
-	BankAccount getPrimaryAccount(String receiverMobile);
+    BankAccount getPrimaryAccount(String mobileNumber);
 	List<BankAccount> getAccountsByUser(User user);
 	
 

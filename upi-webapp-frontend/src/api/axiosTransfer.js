@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-const transferApi = {
+const axiosTransfer = {
   // Step 1: Identify receiver
   identifyReceiver: (data) => axiosInstance.post("/transfer/identify", data),
 
@@ -11,4 +11,4 @@ const transferApi = {
   getMyAccounts: () => axiosInstance.get("/users/my-accounts"),
 };
 
-export default transferApi;
+export default axiosTransfer;

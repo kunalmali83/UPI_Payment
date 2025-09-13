@@ -20,6 +20,8 @@ import com.example.project.repository.UserRepo;
 import com.example.project.security.CustomUserDetails;
 import com.example.project.security.JwtUtil;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -141,6 +143,7 @@ public class UserService {
     }
 
     // ✅ Get user's primary account
+    @Transactional
     public BankAccount getPrimaryAccount(String mobileNumber) {
         User user = getUserByMobile(mobileNumber);
         return user.getAccounts().stream()
