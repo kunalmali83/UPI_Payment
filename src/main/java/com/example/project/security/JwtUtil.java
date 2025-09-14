@@ -1,5 +1,6 @@
 package com.example.project.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -14,8 +15,9 @@ import io.jsonwebtoken.JwtException;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "your_jwt_secret_key_your_jwt_secret_key"; // At least 256-bit (32 characters for HS256)
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
+	 @Value("${jwt.secret}")
+	    private String SECRET;     
+	 private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
     private Key getSigningKey() {
     	
