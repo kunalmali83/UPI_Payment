@@ -15,24 +15,28 @@ const IdentifyReceiver = () => {
     upiId: "",
   });
 
-  const handleChange = (e) => setDetails({ ...details, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setDetails({ ...details, [e.target.name]: e.target.value });
+  };
 
   const identifyReceiver = async () => {
     const payload = { method };
 
     if (method === "ACCOUNT_IFSC") {
-      payload.bankAccount = details.bankAccount;
-      payload.ifsc = details.ifsc;
+      payload.bankAccount = details.bankAccount.trim();
+      payload.ifsc = details.ifsc.trim();
     } else if (method === "MOBILE") {
-      payload.mobile = details.mobile;
+      payload.mobile = details.mobile.trim();
     } else if (method === "UPI") {
-      payload.upiId = details.upiId;
+      payload.upiId = details.upiId.trim();
     }
 
     try {
       const res = await axiosTransfer.identifyReceiver(payload);
       toast.success("Receiver identified!");
-      navigate("/confirm-transfer", { state: { receiver: res.data, method } });
+      navigate("/confirm-transfer", {
+        state: { receiver: res.data, method },
+      });
     } catch (err) {
       toast.error(err.response?.data || "Failed to identify receiver");
     }
@@ -41,7 +45,6 @@ const IdentifyReceiver = () => {
   return (
     <div className="identify-receiver-wrapper">
       <ToastContainer position="top-center" autoClose={2000} />
-
       <h2>Identify Receiver</h2>
 
       <label>Transfer Method:</label>

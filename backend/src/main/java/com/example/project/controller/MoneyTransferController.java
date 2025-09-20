@@ -56,12 +56,16 @@ public class MoneyTransferController {
         }
 
         // ✅ Return minimal info to frontend for confirmation
+     // ✅ Return all required info to frontend for confirmation
         return ResponseEntity.ok(Map.of(
             "receiverName", receiver.getUser().getName(),
             "receiverAccountNo", receiver.getAccountNumber(),
             "bankName", receiver.getBankName(),
-            "receiverMobile", receiver.getUser().getMobileNumber()
+            "receiverMobile", receiver.getUser().getMobileNumber(),
+            "receiverIfsc", receiver.getIfsc(),  // needed for Account+IFSC
+            "upiId", receiver.getUpiId()         // needed for UPI
         ));
+
     }
 
     // ✅ Step 2: Confirm and Transfer

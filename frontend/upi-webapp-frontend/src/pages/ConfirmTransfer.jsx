@@ -8,8 +8,6 @@ import "./ConfirmTransfer.css";
 const ConfirmTransfer = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  // Receiver info passed from IdentifyReceiver
   const { receiver, method } = location.state || {};
 
   const [accounts, setAccounts] = useState([]);
@@ -20,13 +18,17 @@ const ConfirmTransfer = () => {
     message: "",
   });
 
-  // Fetch sender's accounts from backend
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
         const res = await axiosTransfer.getMyAccounts();
         setAccounts(res.data);
-        if (res.data.length > 0) setForm((prev) => ({ ...prev, fromAccountNo: res.data[0].accountNumber }));
+        if (res.data.length > 0) {
+          setForm((prev) => ({
+            ...prev,
+            fromAccountNo: res.data[0].accountNumber,
+          }));
+        }
       } catch (err) {
         toast.error("Failed to fetch accounts");
       }
@@ -34,7 +36,9 @@ const ConfirmTransfer = () => {
     fetchAccounts();
   }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const confirmTransfer = async () => {
     if (!form.amount || !form.pin) {
@@ -43,27 +47,25 @@ const ConfirmTransfer = () => {
     }
 
     const payload = {
-      ...form,
+      fromAccountNo: form.fromAccountNo,
+      amount: form.amount,
+      pin: form.pin,
+      message: form.message,
       method,
       receiverMobile: receiver.receiverMobile,
       receiverAccountNo: receiver.receiverAccountNo,
-      receiverIfsc: receiver.bankName ? receiver.receiverIfsc : undefined,
+      receiverIfsc: receiver.receiverIfsc,
       upiId: receiver.upiId,
     };
 
-     try {
-    await axiosTransfer.confirmTransfer(payload);
-    toast.success("Transaction successful! Redirecting to home...", { autoClose: 2000 });
-
-    // Redirect after 2 seconds to allow toast to show
-    setTimeout(() => {
-      navigate("/home");
-    }, 2000);
-    
-  } catch (err) {
-    toast.error(err.response?.data || "Transaction failed");
-  }
-};
+    try {
+      await axiosTransfer.confirmTransfer(payload);
+      toast.success("Transaction successful! Redirecting...", { autoClose: 2000 });
+      setTimeout(() => navigate("/home"), 2000);
+    } catch (err) {
+      toast.error(err.response?.data || "Transaction failed");
+    }
+  };
 
   if (!receiver) return <p>No receiver information found.</p>;
 
@@ -72,8 +74,13 @@ const ConfirmTransfer = () => {
       <ToastContainer position="top-center" autoClose={2000} />
       <h2>Confirm Transfer</h2>
 
-      <p>Sending money to: <strong>{receiver.receiverName}</strong></p>
-      <p>Account / Mobile: <strong>{receiver.receiverAccountNo || receiver.receiverMobile}</strong></p>
+      <p>
+        Sending money to: <strong>{receiver.receiverName}</strong>
+      </p>
+      <p>
+        Account / Mobile:{" "}
+        <strong>{receiver.receiverAccountNo || receiver.receiverMobile}</strong>
+      </p>
 
       <label>From Account:</label>
       <select name="fromAccountNo" value={form.fromAccountNo} onChange={handleChange}>
