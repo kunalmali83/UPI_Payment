@@ -1,0 +1,74 @@
+.confirm-transfer-wrapper {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.confirm-transfer-wrapper h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #1f2937;
+}
+
+.confirm-transfer-wrapper p {
+  margin-bottom: 15px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.confirm-transfer-wrapper label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.confirm-transfer-wrapper select,
+.confirm-transfer-wrapper input {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+.confirm-transfer-wrapper select:focus,
+.confirm-transfer-wrapper input:focus {
+  border-color: #6366f1;
+}
+
+.confirm-transfer-wrapper button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirm-transfer-wrapper button:hover {
+  background-color: #4f46e5;
+}
+
+.message-error {
+  margin-top: 15px;
+  color: #b91c1c;
+  font-weight: 500;
+  text-align: center;
+}
+
+.message-success {
+  margin-top: 15px;
+  color: #16a34a;
+  font-weight: 500;
+  text-align: center;
+}
