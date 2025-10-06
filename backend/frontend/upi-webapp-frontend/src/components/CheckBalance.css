@@ -1,0 +1,62 @@
+.check-balance-wrapper {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+.check-balance-wrapper h2 {
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.check-balance-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.check-balance-wrapper input {
+  padding: 10px 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.check-balance-wrapper input:focus {
+  border-color: #6366f1;
+}
+
+.check-balance-wrapper button {
+  padding: 10px 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #6366f1;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.check-balance-wrapper button:hover {
+  background-color: #4f46e5;
+}
+
+.balance-display {
+  margin-top: 20px;
+  font-size: 26px;
+  color: #1e3a8a;
+  font-weight: bold;
+}
+
+.error-message {
+  margin-top: 15px;
+  color: #b91c1c;
+  font-weight: 500;
+}

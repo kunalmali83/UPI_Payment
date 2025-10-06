@@ -1,0 +1,54 @@
+.identify-receiver-wrapper {
+  max-width: 450px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.identify-receiver-wrapper h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #1f2937;
+}
+
+.identify-receiver-wrapper label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.identify-receiver-wrapper input,
+.identify-receiver-wrapper select {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+.identify-receiver-wrapper input:focus,
+.identify-receiver-wrapper select:focus {
+  border-color: #6366f1;
+}
+
+.identify-receiver-wrapper button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.identify-receiver-wrapper button:hover {
+  background: #4f46e5;
+}
