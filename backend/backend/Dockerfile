@@ -1,12 +1,17 @@
-# Stage 1: Build the application using a Maven image
-FROM maven:3.8.5-openjdk-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-# Stage 2: Create the final, lightweight image
+# Use OpenJDK 17 (Render supports this version)
 FROM openjdk:17-jdk-slim
+
+# Set working directory inside the container
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+
+# Copy Maven/Gradle project files
+COPY . .
+
+# Package the Spring Boot application
+RUN ./mvnw clean package -DskipTests
+
+# Expose the port your app runs on
+EXPOSE 8081
+
+# Run the JAR
+CMD ["java", "-jar", "target/UPI_payment-0.0.1-SNAPSHOT.jar"]
